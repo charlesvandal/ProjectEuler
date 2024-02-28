@@ -1,3 +1,6 @@
+mod utilities;
+use utilities::s001;
+
 fn main() {
-    println!("Hello, world!");
+    s001::run();
 }
