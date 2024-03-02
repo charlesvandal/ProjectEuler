@@ -47,18 +47,18 @@ pub fn run_solution(solution_id: &SolutionsID) -> bool{
             run_result = run_solution_with_time(solution_id, func);
         },
         None => {
-            println!("Running function not found for solution {:?}", *solution_id);
+            println!("Run function not found for solution {:?}", *solution_id);
         }
     }
 
     run_result
 }
 
-fn run_solution_with_time(solution_id: &SolutionsID, solution: &fn() -> bool) -> bool{
+fn run_solution_with_time(solution_id: &SolutionsID, run_function: &fn() -> bool) -> bool{
     println!("Running solution {:?}...", *solution_id);
 
     let start = Instant::now();
-    let run_result = solution();
+    let run_result = run_function();
     let end = Instant::now();
     let execution_time  = end - start;
 
