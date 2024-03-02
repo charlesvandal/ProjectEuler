@@ -1,12 +1,15 @@
 use std::time::{Duration, Instant};
+use crate::utilities::defines::solution_runner_defines;
 
-pub fn run() {
+pub fn run() -> bool{
     let upper_bound = 1000;
     let multiple_a = 3;
     let multiple_b = 5;
 
     get_sum_of_multiples_slow(multiple_a, multiple_b, upper_bound);
     get_sum_of_multiples_fast(multiple_a, multiple_b, upper_bound);
+
+    solution_runner_defines::SUCCESS
 }
 
 fn get_sum_of_multiples_slow(a:i64, b:i64, upper_bound:i64) {
