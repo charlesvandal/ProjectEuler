@@ -6,10 +6,7 @@ use crate::utilities::defines::solution_runner_defines;
 //Solutions import
 use crate::solutions::s001;
 
-#[derive(PartialEq)]
-#[derive(Eq)]
-#[derive(Hash)]
-#[derive(Debug)]
+#[derive(PartialEq, Eq, Hash, Debug)]
 pub enum SolutionsID {
     S001,
     NumberSolutionsId //Add new IDs before this value
@@ -40,18 +37,16 @@ pub fn run_all_solutions() -> i16{
 
 pub fn run_solution(solution_id: &SolutionsID) -> bool{
     let run_function = SOLUTIONS_RUN_FUNCTION.get(solution_id);
-    let mut run_result = solution_runner_defines::FAIL;
 
-    match run_function {
+    return match run_function {
         Some(func) => {
-            run_result = run_solution_with_time(solution_id, func);
+            run_solution_with_time(solution_id, func)
         },
         None => {
             println!("Run function not found for solution {:?}", *solution_id);
+            solution_runner_defines::FAIL
         }
     }
-
-    run_result
 }
 
 fn run_solution_with_time(solution_id: &SolutionsID, run_function: &fn() -> bool) -> bool{
