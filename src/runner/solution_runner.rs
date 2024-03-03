@@ -1,22 +1,26 @@
 use std::time::Instant;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use lazy_static::lazy_static;
 use crate::utilities::defines::solution_runner_defines;
 
 //Solutions import
 use crate::solutions::s001;
+use crate::solutions::s002;
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
+#[allow(dead_code)]
 pub enum SolutionsID {
     S001,
+    S002,
     NumberSolutionsId //Add new IDs before this value
 }
 
 lazy_static! {
-    static ref SOLUTIONS_RUN_FUNCTION: HashMap<SolutionsID, fn() -> bool> = {
-        let mut hash_map = HashMap::new();
+    static ref SOLUTIONS_RUN_FUNCTION: BTreeMap<SolutionsID, fn() -> bool> = {
+        let mut hash_map = BTreeMap::new();
         
         hash_map.insert(SolutionsID::S001, s001::run as fn() -> bool);
+        hash_map.insert(SolutionsID::S002, s002::run as fn() -> bool);
         hash_map
     };
 }
@@ -75,5 +79,10 @@ mod test {
     #[test]
     fn test_run_s001() {
         assert_eq!(solution_runner_defines::SUCCESS, run_solution(&SolutionsID::S001));
+    }
+
+    #[test]
+    fn test_run_s002() {
+        assert_eq!(solution_runner_defines::SUCCESS, run_solution(&SolutionsID::S002));
     }
 }
