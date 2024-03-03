@@ -1,6 +1,8 @@
+mod runner;
+mod solutions;
 mod utilities;
-use utilities::s001;
+use runner::solution_runner::run_all_solutions;
 
 fn main() {
-    s001::run();
+    run_all_solutions();
 }
