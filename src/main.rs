@@ -1,45 +1,19 @@
-use std::io;
-use std::io::Write;
-
 mod runner;
 mod solutions;
 mod utilities;
 mod parser;
+mod handler;
 
-use parser::arguments_parser::{Parser, ReturnCode};
-use crate::runner::solution_runner::{run_solution, run_all_solutions, SolutionsID};
+use crate::parser::arguments_parser::ArgumentsParser;
+use handler::{arguments_handler::handle_arguments, inputs_handler::handle_inputs};
 
 fn main() {
-    let mut parser = Parser::new();
-    let arguments = parser.parse_arguments();
+    let mut arguments_parser = ArgumentsParser::new();
+    let mut do_exit = false;
 
-    match arguments {
-        ReturnCode::SolveProblem => {
-            let problem_number: SolutionsID = parser.get_problem_number().into();
-            run_solution(&problem_number);
-        }
-        ReturnCode::SolveAll => {
-            run_all_solutions();
-        }
-        ReturnCode::SolveNone => {
-            // Do nothing
-        }
-    }
+    handle_arguments(&mut arguments_parser);
 
-    loop {
-        let mut user_input= String::new();
-
-        print!("Problem number: ");
-        io::stdout().flush().expect("Failed to flush stdout");
-
-        io::stdin().read_line(&mut user_input).expect("Failed to read line");
-        user_input = String::from(user_input.trim());
-
-        if user_input.trim() == "q" {
-            break
-        } else if parser.set_problem_number(&user_input) {
-            let problem_number: SolutionsID = parser.get_problem_number().into();
-            run_solution(&problem_number);
-        }
+    while !do_exit {
+        do_exit = handle_inputs(&mut arguments_parser);
     }
 }
