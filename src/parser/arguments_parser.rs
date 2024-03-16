@@ -1,29 +1,29 @@
 use clap::{App, Arg};
-use crate::parser::parser_data::ParserData;
+use crate::parser::arguments_parser_data::ArgumentsParserData;
 
 const PROBLEM_NUMBER_ARGUMENT_NAME: &str = "problem";
 const SOLVE_ALL_PROBLEMS_ARGUMENT_NAME: &str = "all";
 
 #[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 #[allow(dead_code)]
-pub enum ReturnCode {
+pub enum ParserReturnCode {
     SolveProblem,
     SolveAll,
     SolveNone
 }
 
-pub struct Parser {
-    data: ParserData
+pub struct ArgumentsParser {
+    data: ArgumentsParserData
 }
 
-impl Parser {
+impl ArgumentsParser {
     pub fn new() -> Self {
         Self {
-            data: ParserData::new(0)
+            data: ArgumentsParserData::new(0)
         }
     }
 
-    pub fn parse_arguments(&mut self) -> ReturnCode {
+    pub fn parse_arguments(&mut self) -> ParserReturnCode {
         let mut app = App::new("ProjectEulerSolver")
             .version("1.0")
             .author("Charles-David Lachance & Charles Vandal")
@@ -50,15 +50,15 @@ impl Parser {
         let problem_number = matches.value_of(PROBLEM_NUMBER_ARGUMENT_NAME);
 
         if matches.is_present(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME) {
-            ReturnCode::SolveAll
+            ParserReturnCode::SolveAll
         } else if !problem_number.is_none() {
             if self.set_problem_number(&String::from(problem_number.unwrap())) {
-                ReturnCode::SolveProblem
+                ParserReturnCode::SolveProblem
             } else {
-                ReturnCode::SolveNone
+                ParserReturnCode::SolveNone
             }
         } else {
-            ReturnCode::SolveNone
+            ParserReturnCode::SolveNone
         }
     }
 
@@ -85,11 +85,11 @@ impl Parser {
 
 #[cfg(test)]
 mod test {
-    use crate::parser::arguments_parser::Parser;
+    use crate::parser::arguments_parser::ArgumentsParser;
 
     #[test]
     fn test_get_problem_number() {
-        let parser = Parser::new();
+        let parser = ArgumentsParser::new();
         let expected_problem_number = 0;
         let actual_problem_number = parser.get_problem_number();
 
