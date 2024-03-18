@@ -9,3 +9,4 @@ edition = "2021"
 clap = "4.5.3"
 lazy_static = "1.4"
 fibonacci = { path = "fibonacci" }
+primes = { path = "primes" }
