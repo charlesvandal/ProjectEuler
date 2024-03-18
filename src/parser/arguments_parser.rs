@@ -36,21 +36,22 @@ impl ArgumentsParser {
             .arg(Arg::new(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME)
                 .short('a')
                 .long(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME)
-                .required(false)
-                .num_args(0)
+                .require_equals(true)
+                .num_args(0..=1)
+                .default_missing_value(None)
                 .help("Solve all problems"));
 
         let matches = app.get_matches();
 
-        if matches.contains_id(PROBLEM_NUMBER_ARGUMENT_NAME) {
+        if matches.contains_id(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME) {
+            ParserReturnCode::SolveAll
+        } else if matches.contains_id(PROBLEM_NUMBER_ARGUMENT_NAME) {
             let problem_number = matches.get_one::<String>(PROBLEM_NUMBER_ARGUMENT_NAME);
             if self.set_problem_number(&String::from(problem_number.unwrap())) {
                 ParserReturnCode::SolveProblem
             } else {
                 ParserReturnCode::SolveNone
             }
-        } else if matches.contains_id(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME) {
-            ParserReturnCode::SolveAll
         } else {
             ParserReturnCode::SolveNone
         }
