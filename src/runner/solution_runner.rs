@@ -15,6 +15,16 @@ pub enum SolutionsID {
     NumberSolutionsId //Add new IDs before this value
 }
 
+impl From<i8> for SolutionsID {
+    fn from(value: i8) -> Self {
+        match value {
+            1 => SolutionsID::S001,
+            2 => SolutionsID::S002,
+            _ => SolutionsID::NumberSolutionsId
+        }
+    }
+}
+
 lazy_static! {
     static ref SOLUTIONS_RUN_FUNCTION: BTreeMap<SolutionsID, fn() -> bool> = {
         let mut hash_map = BTreeMap::new();
