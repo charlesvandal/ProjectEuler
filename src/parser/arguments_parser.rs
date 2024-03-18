@@ -4,8 +4,6 @@ use crate::parser::arguments_parser_data::ArgumentsParserData;
 const PROBLEM_NUMBER_ARGUMENT_NAME: &str = "problem";
 const SOLVE_ALL_PROBLEMS_ARGUMENT_NAME: &str = "all";
 
-#[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
-#[allow(dead_code)]
 pub enum ParserReturnCode {
     SolveProblem,
     SolveAll,
