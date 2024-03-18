@@ -1,11 +1,9 @@
-use clap::{App, Arg};
+use clap::{Command, Arg};
 use crate::parser::arguments_parser_data::ArgumentsParserData;
 
 const PROBLEM_NUMBER_ARGUMENT_NAME: &str = "problem";
 const SOLVE_ALL_PROBLEMS_ARGUMENT_NAME: &str = "all";
 
-#[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
-#[allow(dead_code)]
 pub enum ParserReturnCode {
     SolveProblem,
     SolveAll,
@@ -24,34 +22,28 @@ impl ArgumentsParser {
     }
 
     pub fn parse_arguments(&mut self) -> ParserReturnCode {
-        let mut app = App::new("ProjectEulerSolver")
+        let app = Command::new("ProjectEulerSolver")
             .version("1.0")
             .author("Charles-David Lachance & Charles Vandal")
-            .about("A solver of ProjectEuler problems");
-
-        let problem_option = Arg::with_name(PROBLEM_NUMBER_ARGUMENT_NAME)
-            .short('p')
-            .long(PROBLEM_NUMBER_ARGUMENT_NAME)
-            .takes_value(true)
-            .required(false)
-            .help("Problem to solve with format XXX where X is a digit");
-
-        let all_problems_option = Arg::with_name(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME)
-            .short('a')
-            .long(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME)
-            .takes_value(false)
-            .required(false)
-            .help("Solve all problems");
-
-        app = app.arg(problem_option);
-        app = app.arg(all_problems_option);
+            .about("A solver of ProjectEuler problems")
+            .arg(Arg::new(PROBLEM_NUMBER_ARGUMENT_NAME)
+                     .short('p')
+                     .long(PROBLEM_NUMBER_ARGUMENT_NAME)
+                     .required(false)
+                     .help("Problem to solve with format XXX where X is a digit"))
+            .arg(Arg::new(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME)
+                    .short('a')
+                    .long(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME)
+                    .required(false)
+                    .help("Solve all problems"));
 
         let matches = app.get_matches();
-        let problem_number = matches.value_of(PROBLEM_NUMBER_ARGUMENT_NAME);
 
-        if matches.is_present(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME) {
+        if matches.contains_id(SOLVE_ALL_PROBLEMS_ARGUMENT_NAME) {
             ParserReturnCode::SolveAll
-        } else if !problem_number.is_none() {
+         } else if matches.contains_id(PROBLEM_NUMBER_ARGUMENT_NAME) {
+            let problem_number =  matches.get_one::<String>(PROBLEM_NUMBER_ARGUMENT_NAME);
+
             if self.set_problem_number(&String::from(problem_number.unwrap())) {
                 ParserReturnCode::SolveProblem
             } else {
