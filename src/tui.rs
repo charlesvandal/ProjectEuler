@@ -18,16 +18,30 @@ use std::io;
 
 #[derive(Debug, Default)]
 pub struct App {
-    state: ListState,
+    state: AppState,
     problems: Vec<Problem>,
     exit: bool,
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct AppState {
+    list_state: ListState,
+}
+
+impl AppState {
+    fn new() -> Self {
+        let mut list_state = ListState::default();
+        list_state.select(Some(0));
+        AppState {
+            list_state,
+        }
+    }
 }
 
 impl App {
     pub fn run(&mut self, terminal: &mut DefaultTerminal, problems: Vec<Problem>) -> io::Result<()> {
         self.problems = problems;
-        self.state = ListState::default();
-        self.state.select(Some(0));
+        self.state = AppState::new();
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
@@ -36,7 +50,7 @@ impl App {
     }
 
     fn draw(&self, frame: &mut Frame) {
-        frame.render_stateful_widget(self, frame.area(), &mut ());
+        frame.render_stateful_widget(self, frame.area(), &mut self.state.clone());
     }
 
     // TODO Could add mouse event?
@@ -65,13 +79,13 @@ impl App {
     }
 
     fn select_next(&mut self) {
-        if (self.state.selected().unwrap() < self.problems.len() - 1) {
-            self.state.select_next();
+        if (self.state.list_state.selected().unwrap() < self.problems.len() - 1) {
+            self.state.list_state.select_next();
         }
     }
 
     fn select_prev(&mut self) {
-        self.state.select_previous();
+        self.state.list_state.select_previous();
     }
 
     // TODO This break the tui since it writes directly to the standard output
@@ -82,14 +96,14 @@ impl App {
         what solution was run and what to display.
      */
     fn run_solution(&mut self) {
-        let solution_index = self.state.selected().unwrap() as i8;
+        let solution_index = self.state.list_state.selected().unwrap() as i8;
         let solution_id = solution_runner::SolutionsID::from(solution_index + 1);
         solution_runner::run_solution(&solution_id);
     }
 }
 
 impl StatefulWidget for &App {
-    type State = ();
+    type State = AppState;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
         let title = Title::from(" Project Euler ".bold());
@@ -120,10 +134,10 @@ impl StatefulWidget for &App {
             .map(|problem| ListItem::new(format!("{:<4}  {}", problem.id, problem.name)))
             .collect();
 
-        let list = List::new(items)
+        List::new(items)
             .block(left_block)
             .highlight_style(ratatui::style::Style::default().fg(ratatui::style::Color::LightYellow))
             .highlight_symbol(">> ")
-            .render(area, buf, &mut self.state.clone());
+            .render(area, buf, &mut state.list_state.clone());
     }
 }
