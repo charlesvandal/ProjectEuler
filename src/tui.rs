@@ -1,14 +1,15 @@
 use crate::metadata_parser::Problem;
 use crate::runner::solution_runner;
+use crate::solutions::solution::SolutionResult;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use ratatui::widgets::{List, ListItem, ListState, StatefulWidget};
+use ratatui::layout::{Constraint, Direction, Layout};
+use ratatui::widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget, Widget};
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
     style::Stylize,
     symbols::border,
     text::Line,
-    widgets::Block,
     DefaultTerminal, Frame,
 };
 use std::io;
@@ -23,6 +24,7 @@ pub struct App {
 #[derive(Debug, Default, Clone)]
 pub struct AppState {
     list_state: ListState,
+    solution_result: Option<SolutionResult>,
 }
 
 impl AppState {
@@ -31,6 +33,7 @@ impl AppState {
         list_state.select(Some(0));
         AppState {
             list_state,
+            solution_result: None,
         }
     }
 }
@@ -95,7 +98,7 @@ impl App {
     fn run_solution(&mut self) {
         let solution_index = self.state.list_state.selected().unwrap() as i8;
         let solution_id = solution_runner::SolutionsID::from(solution_index + 1);
-        solution_runner::run_solution(&solution_id);
+        self.state.solution_result = Some(solution_runner::run_solution(&solution_id).unwrap().clone());
     }
 }
 
@@ -103,6 +106,18 @@ impl StatefulWidget for &App {
     type State = AppState;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+        let vertical_chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .margin(1)
+            .constraints([Constraint::Percentage(80), Constraint::Percentage(20)])
+            .split(area);
+
+        let horizontal_chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .margin(1)
+            .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])
+            .split(vertical_chunks[0]);
+
         let title = Line::from(" Project Euler ".bold()).centered();
         let instructions = Line::from(Line::from(vec![
             " Select ".into(),
@@ -127,10 +142,26 @@ impl StatefulWidget for &App {
             .map(|problem| ListItem::new(format!("{:<4}  {}", problem.id, problem.name)))
             .collect();
 
-        List::new(items)
-            .block(block)
-            .highlight_style(ratatui::style::Style::default().fg(ratatui::style::Color::LightYellow))
-            .highlight_symbol(">> ")
-            .render(area, buf, &mut state.list_state.clone());
+        StatefulWidget::render(
+            List::new(items)
+                .block(block)
+                .highlight_style(ratatui::style::Style::default().fg(ratatui::style::Color::LightYellow))
+                .highlight_symbol(">> "), horizontal_chunks[0], buf, &mut state.list_state.clone());
+
+
+        let solution = match self.state.solution_result.as_ref() {
+            Some(solution_result) => solution_result.to_string(),
+            None => format!("{}", "Run a solution to see the result")
+        };
+
+        let answer_block = Block::bordered()
+            .border_set(border::DOUBLE);
+        Widget::render(Paragraph::new(solution).block(answer_block), vertical_chunks[1], buf);
+
+        let current_index = self.state.list_state.selected().unwrap();
+        let description = self.problems[current_index].description.clone();
+        let description_block = Block::bordered()
+            .border_set(border::THICK);
+        Widget::render(Paragraph::new(description).block(description_block), horizontal_chunks[1], buf);
     }
 }
