@@ -4,14 +4,11 @@ use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::widgets::{List, ListItem, ListState, StatefulWidget};
 use ratatui::{
     buffer::Buffer,
-    layout::{Alignment, Rect},
+    layout::Rect,
     style::Stylize,
     symbols::border,
     text::Line,
-    widgets::{
-        block::{Position, Title},
-        Block,
-    },
+    widgets::Block,
     DefaultTerminal, Frame,
 };
 use std::io;
@@ -79,7 +76,7 @@ impl App {
     }
 
     fn select_next(&mut self) {
-        if (self.state.list_state.selected().unwrap() < self.problems.len() - 1) {
+        if self.state.list_state.selected().unwrap() < self.problems.len() - 1 {
             self.state.list_state.select_next();
         }
     }
@@ -106,8 +103,8 @@ impl StatefulWidget for &App {
     type State = AppState;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        let title = Title::from(" Project Euler ".bold());
-        let instructions = Title::from(Line::from(vec![
+        let title = Line::from(" Project Euler ".bold()).centered();
+        let instructions = Line::from(Line::from(vec![
             " Select ".into(),
             "<Enter>, <e>".blue().bold(),
             " Previous ".into(),
@@ -116,15 +113,11 @@ impl StatefulWidget for &App {
             "<Down>, <s>".blue().bold(),
             " Quit ".into(),
             " <Esc>, <q> ".blue().bold(),
-        ]));
+        ])).centered();
 
-        let left_block = Block::bordered()
-            .title(title.alignment(Alignment::Center))
-            .title(
-                instructions
-                    .alignment(Alignment::Center)
-                    .position(Position::Bottom),
-            )
+        let block = Block::bordered()
+            .title_top(title)
+            .title_bottom(instructions)
             .border_set(border::THICK);
 
 
@@ -135,7 +128,7 @@ impl StatefulWidget for &App {
             .collect();
 
         List::new(items)
-            .block(left_block)
+            .block(block)
             .highlight_style(ratatui::style::Style::default().fg(ratatui::style::Color::LightYellow))
             .highlight_symbol(">> ")
             .render(area, buf, &mut state.list_state.clone());
