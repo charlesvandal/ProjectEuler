@@ -19,11 +19,10 @@ impl SolutionResult {
 
 impl fmt::Display for SolutionResult {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let micros = self.execution_time.as_micros();
         write!(
             f,
-            "Answer: {}, Execution Time: {}μs, ",
-            self.result, micros
+            "Answer: {}, Execution Time: {:?}",
+            self.result, self.execution_time
         )
     }
 }
