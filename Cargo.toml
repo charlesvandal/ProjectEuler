@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = "4.5.3"
 fibonacci = { path = "fibonacci" }
 primes = { path = "primes" }
 once_cell = "1.20.2"
