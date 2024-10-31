@@ -2,14 +2,13 @@ use crate::metadata_parser::Problem;
 use crate::runner::solution_runner;
 use crate::solutions::solution::SolutionResult;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use ratatui::layout::{Constraint, Direction, Layout};
-use ratatui::widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget, Widget, Wrap};
 use ratatui::{
     buffer::Buffer,
-    layout::Rect,
-    style::Stylize,
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Style, Stylize},
     symbols::border,
     text::Line,
+    widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget, Widget, Wrap},
     DefaultTerminal, Frame,
 };
 use std::io;
@@ -138,7 +137,7 @@ impl App {
         StatefulWidget::render(
             List::new(items)
                 .block(block)
-                .highlight_style(ratatui::style::Style::default().fg(ratatui::style::Color::LightYellow))
+                .highlight_style(Style::default().fg(Color::LightYellow))
                 .highlight_symbol(">> "), area, buf, &mut state.list_state);
     }
 
