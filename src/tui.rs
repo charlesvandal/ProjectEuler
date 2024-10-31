@@ -3,7 +3,7 @@ use crate::runner::solution_runner;
 use crate::solutions::solution::SolutionResult;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::layout::{Constraint, Direction, Layout};
-use ratatui::widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget, Widget};
+use ratatui::widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget, Widget, Wrap};
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -88,37 +88,14 @@ impl App {
         self.state.list_state.select_previous();
     }
 
-    // TODO This break the tui since it writes directly to the standard output
-    /*
-        Will need to update how the state is handled.
-        In the implementation of Stateful Widget, I need a custom AppState instead of keeping a ref in the App.
-        The AppState will keep a reference of the ListState and also have a something like a DisplayState to know
-        what solution was run and what to display.
-     */
     fn run_solution(&mut self) {
         let solution_index = self.state.list_state.selected().unwrap() as i8;
         let solution_id = solution_runner::SolutionsID::from(solution_index + 1);
         self.state.solution_result = Some(solution_runner::run_solution(&solution_id).unwrap().clone());
     }
-}
 
-impl StatefulWidget for &App {
-    type State = AppState;
-
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        let vertical_chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .margin(1)
-            .constraints([Constraint::Percentage(80), Constraint::Percentage(20)])
-            .split(area);
-
-        let horizontal_chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .margin(1)
-            .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])
-            .split(vertical_chunks[0]);
-
-        let title = Line::from(" Project Euler ".bold()).centered();
+    fn render_main_window(&self, area: Rect, buf: &mut Buffer) {
+        let title = Line::from(" Project Euler ").blue().bold().centered();
         let instructions = Line::from(Line::from(vec![
             " Select ".into(),
             "<Enter>, <e>".blue().bold(),
@@ -130,11 +107,27 @@ impl StatefulWidget for &App {
             " <Esc>, <q> ".blue().bold(),
         ])).centered();
 
-        let block = Block::bordered()
+        Block::bordered()
             .title_top(title)
             .title_bottom(instructions)
-            .border_set(border::THICK);
+            .border_set(border::THICK)
+            .render(area, buf);
+    }
 
+    fn render_result(&self, area: Rect, buf: &mut Buffer) {
+        let solution = match self.state.solution_result.as_ref() {
+            Some(solution_result) => solution_result.to_string(),
+            None => format!("{}", "Run a solution to see the result")
+        };
+        let block = Block::bordered()
+            .border_set(border::DOUBLE);
+
+        Paragraph::new(solution).block(block).render(area, buf);
+    }
+
+    fn render_problem_list(&self, area: Rect, buf: &mut Buffer, state: &mut AppState) {
+        let block = Block::bordered()
+            .border_set(border::THICK);
 
         let items: Vec<ListItem> = self.problems
             .iter()
@@ -146,22 +139,37 @@ impl StatefulWidget for &App {
             List::new(items)
                 .block(block)
                 .highlight_style(ratatui::style::Style::default().fg(ratatui::style::Color::LightYellow))
-                .highlight_symbol(">> "), horizontal_chunks[0], buf, &mut state.list_state.clone());
+                .highlight_symbol(">> "), area, buf, &mut state.list_state);
+    }
 
-
-        let solution = match self.state.solution_result.as_ref() {
-            Some(solution_result) => solution_result.to_string(),
-            None => format!("{}", "Run a solution to see the result")
-        };
-
-        let answer_block = Block::bordered()
-            .border_set(border::DOUBLE);
-        Widget::render(Paragraph::new(solution).block(answer_block), vertical_chunks[1], buf);
-
+    fn render_description(&self, area: Rect, buf: &mut Buffer) {
         let current_index = self.state.list_state.selected().unwrap();
         let description = self.problems[current_index].description.clone();
         let description_block = Block::bordered()
             .border_set(border::THICK);
-        Widget::render(Paragraph::new(description).block(description_block), horizontal_chunks[1], buf);
+
+        Paragraph::new(description).wrap(Wrap { trim: true }).block(description_block).render(area, buf);
+    }
+}
+
+impl StatefulWidget for &App {
+    type State = AppState;
+
+    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+        let vertical_chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .margin(3)
+            .constraints([Constraint::Percentage(80), Constraint::Min(3)])
+            .split(area);
+
+        let horizontal_chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(40), Constraint::Min(3), Constraint::Percentage(60)])
+            .split(vertical_chunks[0]);
+
+        self.render_main_window(area, buf);
+        self.render_result(vertical_chunks[1], buf);
+        self.render_problem_list(horizontal_chunks[0], buf, state);
+        self.render_description(horizontal_chunks[2], buf);
     }
 }

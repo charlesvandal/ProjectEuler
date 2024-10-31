@@ -25,55 +25,58 @@ impl From<i8> for SolutionsID {
     }
 }
 
-static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, SolutionResult>> = Lazy::new(|| {
+static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, Box<fn() -> SolutionResult>>> = Lazy::new(|| {
     let mut hash_map = BTreeMap::new();
 
-    hash_map.insert(SolutionsID::S001, S001::run());
-    hash_map.insert(SolutionsID::S002, S002::run());
-    hash_map.insert(SolutionsID::S003, S003::run());
+    hash_map.insert(SolutionsID::S001, Box::new(S001::run as fn() -> SolutionResult));
+    hash_map.insert(SolutionsID::S002, Box::new(S002::run));
+    hash_map.insert(SolutionsID::S003, Box::new(S003::run));
     hash_map
 });
 
 // TODO This just wont work right now
-pub fn run_all_solutions() -> i16 {
-    let mut number_successful_solutions = 0;
+// pub fn run_all_solutions() -> i16 {
+//     let mut number_successful_solutions = 0;
+//
+//     for solution_id in SOLUTIONS_RUN_FUNCTION.keys() {
+//         let run_result = run_solution(&solution_id);
+//
+//         // if run_result == solution_runner_defines::SUCCESS {
+//         //     number_successful_solutions += 1;
+//         // }
+//     }
+//
+//     number_successful_solutions
+// }
 
-    for solution_id in SOLUTIONS_RUN_FUNCTION.keys() {
-        let run_result = run_solution(&solution_id);
-
-        // if run_result == solution_runner_defines::SUCCESS {
-        //     number_successful_solutions += 1;
-        // }
+pub fn run_solution(solution_id: &SolutionsID) -> Option<SolutionResult> {
+    if let Some(run_fn) = SOLUTIONS_RUN_FUNCTION.get(solution_id) {
+        return Some(run_fn());
     }
-
-    number_successful_solutions
-}
-
-pub fn run_solution(solution_id: &SolutionsID) -> Option<&SolutionResult> {
-    SOLUTIONS_RUN_FUNCTION.get(solution_id)
+    None
 }
 
 
 #[cfg(test)]
 mod test {
-
+    use crate::runner::solution_runner::{run_solution, SolutionsID};
     // #[test]
     // fn test_run_all_solutions() {
     //     assert_eq!(SolutionsID::NumberSolutionsId as i16, run_all_solutions());
     // }
-    //
-    // #[test]
-    // fn test_run_s001() {
-    //     assert_eq!(solution_runner_defines::SUCCESS, run_solution(&SolutionsID::S001));
-    // }
-    //
-    // #[test]
-    // fn test_run_s002() {
-    //     assert_eq!(solution_runner_defines::SUCCESS, run_solution(&SolutionsID::S002));
-    // }
-    //
-    // #[test]
-    // fn test_run_s003() {
-    //     assert_eq!(solution_runner_defines::SUCCESS, run_solution(&SolutionsID::S003));
-    // }
+
+    #[test]
+    fn test_run_s001() {
+        assert!(run_solution(&SolutionsID::S001).is_some());
+    }
+
+    #[test]
+    fn test_run_s002() {
+        assert!(run_solution(&SolutionsID::S002).is_some());
+    }
+
+    #[test]
+    fn test_run_s003() {
+        assert!(run_solution(&SolutionsID::S003).is_some());
+    }
 }
