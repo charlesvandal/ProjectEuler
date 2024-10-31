@@ -50,10 +50,10 @@ static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, Box<fn() -> SolutionRe
 // }
 
 pub fn run_solution(solution_id: &SolutionsID) -> Option<SolutionResult> {
-    if let Some(run_fn) = SOLUTIONS_RUN_FUNCTION.get(solution_id) {
-        return Some(run_fn());
+    match SOLUTIONS_RUN_FUNCTION.get(solution_id) {
+        Some(run_fn) => Some(run_fn()),
+        None => None,
     }
-    None
 }
 
 

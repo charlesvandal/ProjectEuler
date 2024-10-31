@@ -90,7 +90,10 @@ impl App {
     fn run_solution(&mut self) {
         let solution_index = self.state.list_state.selected().unwrap() as i8;
         let solution_id = solution_runner::SolutionsID::from(solution_index + 1);
-        self.state.solution_result = Some(solution_runner::run_solution(&solution_id).unwrap().clone());
+        match solution_runner::run_solution(&solution_id) {
+            Some(solution_result) => self.state.solution_result = Some(solution_result),
+            None => self.state.solution_result = None,
+        }
     }
 
     fn render_main_window(&self, area: Rect, buf: &mut Buffer) {
