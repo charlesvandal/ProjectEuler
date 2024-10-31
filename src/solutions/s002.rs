@@ -31,6 +31,7 @@ fn sum_even_valued_fibonacci_terms_loop() -> i64 {
     sum
 }
 
+#[allow(dead_code)]
 fn sum_even_valued_fibonacci_terms_recursive() -> i64 {
     let mut sum = 0;
     let mut index = 2;

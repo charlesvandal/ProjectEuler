@@ -15,6 +15,7 @@ impl Solution for S001 {
     }
 }
 
+#[allow(dead_code)]
 fn get_sum_of_multiples_slow(a: i64, b: i64, upper_bound: i64) -> i64 {
     let mut sum = 0;
 
