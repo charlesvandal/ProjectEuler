@@ -1,11 +1,8 @@
+use crate::solutions::*;
+use crate::utilities::defines::solution_runner_defines;
+use once_cell::sync::Lazy;
 use std::collections::BTreeMap;
 use std::time::Instant;
-
-use lazy_static::lazy_static;
-
-//Solutions import
-use crate::solutions::{s001, s002, s003};
-use crate::utilities::defines::solution_runner_defines;
 
 #[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 #[allow(dead_code)]
@@ -27,16 +24,14 @@ impl From<i8> for SolutionsID {
     }
 }
 
-lazy_static! {
-    static ref SOLUTIONS_RUN_FUNCTION: BTreeMap<SolutionsID, fn() -> bool> = {
-        let mut hash_map = BTreeMap::new();
-        
-        hash_map.insert(SolutionsID::S001, s001::run as fn() -> bool);
-        hash_map.insert(SolutionsID::S002, s002::run as fn() -> bool);
-        hash_map.insert(SolutionsID::S003, s003::run as fn() -> bool);
-        hash_map
-    };
-}
+static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, fn() -> bool>> = Lazy::new(|| {
+    let mut hash_map = BTreeMap::new();
+
+    hash_map.insert(SolutionsID::S001, s001::run as fn() -> bool);
+    hash_map.insert(SolutionsID::S002, s002::run as fn() -> bool);
+    hash_map.insert(SolutionsID::S003, s003::run as fn() -> bool);
+    hash_map
+});
 
 pub fn run_all_solutions() -> i16 {
     let mut number_successful_solutions = 0;
@@ -53,17 +48,15 @@ pub fn run_all_solutions() -> i16 {
 }
 
 pub fn run_solution(solution_id: &SolutionsID) -> bool {
-    let run_function = SOLUTIONS_RUN_FUNCTION.get(solution_id);
-
-    return match run_function {
-        Some(func) => {
-            run_solution_with_time(solution_id, func)
-        }
-        None => {
-            println!("Run function not found for solution {:?}", *solution_id);
-            solution_runner_defines::FAIL
-        }
-    };
+    SOLUTIONS_RUN_FUNCTION
+        .get(solution_id)
+        .map_or_else(
+            || {
+                println!("Run function not found for solution {:?}", *solution_id);
+                solution_runner_defines::FAIL
+            },
+            |func| run_solution_with_time(solution_id, func),
+        )
 }
 
 fn run_solution_with_time(solution_id: &SolutionsID, run_function: &fn() -> bool) -> bool {
@@ -71,8 +64,7 @@ fn run_solution_with_time(solution_id: &SolutionsID, run_function: &fn() -> bool
 
     let start = Instant::now();
     let run_result = run_function();
-    let end = Instant::now();
-    let execution_time = end - start;
+    let execution_time = Instant::now() - start;
 
     println!("Solution {:?} ran for {:?} and returned {}\n", *solution_id, execution_time, run_result);
 
