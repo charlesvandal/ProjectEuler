@@ -1,7 +1,5 @@
-use crate::solutions::s001::S001;
-use crate::solutions::s002::S002;
-use crate::solutions::s003::S003;
 use crate::solutions::solution::{Solution, SolutionResult};
+use crate::solutions::*;
 use once_cell::sync::Lazy;
 use std::collections::BTreeMap;
 
