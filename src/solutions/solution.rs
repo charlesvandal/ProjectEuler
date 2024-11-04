@@ -1,8 +1,15 @@
 use std::fmt;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 pub trait Solution {
-    fn run() -> SolutionResult;
+    fn execute() -> String;
+
+    fn run() -> SolutionResult {
+        let start = Instant::now();
+        let result = Self::execute();
+        let end = Instant::now();
+        SolutionResult::new(end - start, result)
+    }
 }
 
 #[derive(Debug, Default, Clone)]

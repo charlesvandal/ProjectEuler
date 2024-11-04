@@ -1,17 +1,13 @@
-use crate::solutions::solution::{Solution, SolutionResult};
+use crate::solutions::solution::Solution;
 use fibonacci::fibonacci_helper::{calculate_fibonacci_loop, calculate_fibonacci_recursive};
-use std::time::Instant;
 
 const NUMBER_LIMIT: i64 = 4000000;
 
 pub struct S002;
 
 impl Solution for S002 {
-    fn run() -> SolutionResult {
-        let start = Instant::now();
-        let result = sum_even_valued_fibonacci_terms_loop();
-        let end = Instant::now();
-        SolutionResult::new(end - start, result.to_string())
+    fn execute() -> String {
+        sum_even_valued_fibonacci_terms_loop().to_string()
     }
 }
 

@@ -1,5 +1,4 @@
-use crate::solutions::solution::{Solution, SolutionResult};
-use std::time::Instant;
+use crate::solutions::solution::Solution;
 
 const UPPER_BOUND: i64 = 1000;
 const MULTIPLE_A: i64 = 3;
@@ -7,11 +6,8 @@ const MULTIPLE_B: i64 = 5;
 
 pub struct S001;
 impl Solution for S001 {
-    fn run() -> SolutionResult {
-        let start = Instant::now();
-        let result = get_sum_of_multiples_fast(MULTIPLE_A, MULTIPLE_B, UPPER_BOUND);
-        let end = Instant::now();
-        SolutionResult::new(end - start, result.to_string())
+    fn execute() -> String {
+        get_sum_of_multiples_fast(MULTIPLE_A, MULTIPLE_B, UPPER_BOUND).to_string()
     }
 }
 
