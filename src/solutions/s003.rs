@@ -1,12 +1,14 @@
+use crate::solutions::solution::Solution;
 use primes::primes_helper;
-
-use crate::utilities::defines::solution_runner_defines;
 
 const INPUT: i64 = 600851475143;
 
-pub fn run() -> bool {
-    find_largest_prime_factor(INPUT);
-    solution_runner_defines::SUCCESS
+pub struct S003;
+
+impl Solution for S003 {
+    fn execute() -> String {
+        find_largest_prime_factor(INPUT).to_string()
+    }
 }
 
 fn find_largest_prime_factor(number: i64) -> i64 {
