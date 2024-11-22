@@ -89,7 +89,7 @@ impl App {
 
     fn run_solution(&mut self) {
         let solution_index = self.state.list_state.selected().unwrap() as i8;
-        let solution_id = solution_runner::SolutionsID::from(solution_index + 1);
+        let solution_id = solution_runner::SolutionsID::from(solution_index);
         match solution_runner::run_solution(&solution_id) {
             Some(solution_result) => self.state.solution_result = Some(solution_result),
             None => self.state.solution_result = None,
@@ -133,7 +133,6 @@ impl App {
 
         let items: Vec<ListItem> = self.problems
             .iter()
-            // Probably a better way to format the line
             .map(|problem| ListItem::new(format!("{:<4}  {}", problem.id, problem.name)))
             .collect();
 

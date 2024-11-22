@@ -15,9 +15,9 @@ pub enum SolutionsID {
 impl From<i8> for SolutionsID {
     fn from(value: i8) -> Self {
         match value {
-            1 => SolutionsID::S001,
-            2 => SolutionsID::S002,
-            3 => SolutionsID::S003,
+            0 => SolutionsID::S001,
+            1 => SolutionsID::S002,
+            2 => SolutionsID::S003,
             _ => SolutionsID::NumberSolutionsId
         }
     }
