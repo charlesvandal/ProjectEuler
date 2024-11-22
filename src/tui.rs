@@ -17,11 +17,11 @@ use std::io;
 pub struct App {
     state: AppState,
     problems: Vec<Problem>,
-    exit: bool,
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct AppState {
+    exit: bool,
     list_state: ListState,
     solution_result: Option<SolutionResult>,
 }
@@ -31,6 +31,7 @@ impl AppState {
         let mut list_state = ListState::default();
         list_state.select(Some(0));
         AppState {
+            exit: false,
             list_state,
             solution_result: None,
         }
@@ -41,7 +42,7 @@ impl App {
     pub fn run(&mut self, terminal: &mut DefaultTerminal, problems: Vec<Problem>) -> io::Result<()> {
         self.problems = problems;
         self.state = AppState::new();
-        while !self.exit {
+        while !self.state.exit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
         }
@@ -74,7 +75,7 @@ impl App {
     }
 
     fn exit(&mut self) {
-        self.exit = true;
+        self.state.exit = true;
     }
 
     fn select_next(&mut self) {
