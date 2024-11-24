@@ -1,6 +1,4 @@
-use crate::metadata_parser::Problem;
-use crate::runner::solution_runner;
-use crate::solutions::solution::SolutionResult;
+use crate::state::AppState;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     buffer::Buffer,
@@ -8,49 +6,28 @@ use ratatui::{
     style::{Color, Style, Stylize},
     symbols::border,
     text::Line,
-    widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget, Widget, Wrap},
-    DefaultTerminal, Frame,
+    widgets::{Block, List, ListItem, Paragraph, StatefulWidget, Widget, Wrap}
+    ,
 };
 use std::io;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct App {
     state: AppState,
-    problems: Vec<Problem>,
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct AppState {
-    exit: bool,
-    list_state: ListState,
-    solution_result: Option<SolutionResult>,
-}
-
-impl AppState {
-    fn new() -> Self {
-        let mut list_state = ListState::default();
-        list_state.select(Some(0));
-        AppState {
-            exit: false,
-            list_state,
-            solution_result: None,
-        }
-    }
 }
 
 impl App {
-    pub fn run(&mut self, terminal: &mut DefaultTerminal, problems: Vec<Problem>) -> io::Result<()> {
-        self.problems = problems;
-        self.state = AppState::new();
-        while !self.state.exit {
-            terminal.draw(|frame| self.draw(frame))?;
+    pub fn new(state: AppState) -> Self {
+        App { state }
+    }
+
+    pub fn run(&mut self) -> io::Result<()> {
+        let mut terminal = ratatui::init();
+        while self.state.is_running() {
+            terminal.draw(|frame| self.render(frame.area(), frame.buffer_mut()))?;
             self.handle_events()?;
         }
         Ok(())
-    }
-
-    fn draw(&self, frame: &mut Frame) {
-        frame.render_stateful_widget(self, frame.area(), &mut self.state.clone());
     }
 
     // TODO Could add mouse event?
@@ -66,34 +43,11 @@ impl App {
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
-            KeyCode::Esc | KeyCode::Char('q') => self.exit(),
-            KeyCode::Up | KeyCode::Char('w') => self.select_prev(),
-            KeyCode::Down | KeyCode::Char('s') => self.select_next(),
-            KeyCode::Enter | KeyCode::Char('e') => self.run_solution(),
+            KeyCode::Esc | KeyCode::Char('q') => self.state.exit(),
+            KeyCode::Up | KeyCode::Char('w') => self.state.select_prev(),
+            KeyCode::Down | KeyCode::Char('s') => self.state.select_next(),
+            KeyCode::Enter | KeyCode::Char('e') => self.state.run_solution(),
             _ => {}
-        }
-    }
-
-    fn exit(&mut self) {
-        self.state.exit = true;
-    }
-
-    fn select_next(&mut self) {
-        if self.state.list_state.selected().unwrap() < self.problems.len() - 1 {
-            self.state.list_state.select_next();
-        }
-    }
-
-    fn select_prev(&mut self) {
-        self.state.list_state.select_previous();
-    }
-
-    fn run_solution(&mut self) {
-        let solution_index = self.state.list_state.selected().unwrap() as i8;
-        let solution_id = solution_runner::SolutionsID::from(solution_index);
-        match solution_runner::run_solution(&solution_id) {
-            Some(solution_result) => self.state.solution_result = Some(solution_result),
-            None => self.state.solution_result = None,
         }
     }
 
@@ -128,11 +82,11 @@ impl App {
         Paragraph::new(solution).block(block).render(area, buf);
     }
 
-    fn render_problem_list(&self, area: Rect, buf: &mut Buffer, state: &mut AppState) {
+    fn render_problem_list(&mut self, area: Rect, buf: &mut Buffer) {
         let block = Block::bordered()
             .border_set(border::THICK);
 
-        let items: Vec<ListItem> = self.problems
+        let items: Vec<ListItem> = self.state.problems
             .iter()
             .map(|problem| ListItem::new(format!("{:<4}  {}", problem.id, problem.name)))
             .collect();
@@ -141,23 +95,19 @@ impl App {
             List::new(items)
                 .block(block)
                 .highlight_style(Style::default().fg(Color::LightYellow))
-                .highlight_symbol(">> "), area, buf, &mut state.list_state);
+                .highlight_symbol(">> "), area, buf, &mut self.state.list_state);
     }
 
-    fn render_description(&self, area: Rect, buf: &mut Buffer) {
+    fn render_description(&mut self, area: Rect, buf: &mut Buffer) {
         let current_index = self.state.list_state.selected().unwrap();
-        let description = self.problems[current_index].description.clone();
+        let description = self.state.problems[current_index].description.clone();
         let description_block = Block::bordered()
             .border_set(border::THICK);
 
         Paragraph::new(description).wrap(Wrap { trim: true }).block(description_block).render(area, buf);
     }
-}
 
-impl StatefulWidget for &App {
-    type State = AppState;
-
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+    fn render(&mut self, area: Rect, buf: &mut Buffer) {
         let vertical_chunks = Layout::default()
             .direction(Direction::Vertical)
             .margin(3)
@@ -171,7 +121,7 @@ impl StatefulWidget for &App {
 
         self.render_main_window(area, buf);
         self.render_result(vertical_chunks[1], buf);
-        self.render_problem_list(horizontal_chunks[0], buf, state);
+        self.render_problem_list(horizontal_chunks[0], buf);
         self.render_description(horizontal_chunks[2], buf);
     }
 }
