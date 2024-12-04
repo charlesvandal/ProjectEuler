@@ -1,42 +1,45 @@
+use crate::solutions::solution::Solution;
 use fibonacci::fibonacci_helper::{calculate_fibonacci_loop, calculate_fibonacci_recursive};
-use crate::utilities::defines::solution_runner_defines;
 
 const NUMBER_LIMIT: i64 = 4000000;
 
-pub fn run() -> bool {
-    sum_even_valued_fibonacci_terms_loop();
-    sum_even_valued_fibonacci_terms_recursive();
-    solution_runner_defines::SUCCESS
+pub struct S002;
+
+impl Solution for S002 {
+    fn execute() -> String {
+        sum_even_valued_fibonacci_terms_loop().to_string()
+    }
 }
 
-fn sum_even_valued_fibonacci_terms_loop() -> i64{
+fn sum_even_valued_fibonacci_terms_loop() -> i64 {
     let mut sum = 0;
-	let mut index = 2;
+    let mut index = 2;
 
-	while calculate_fibonacci_loop(index) <= NUMBER_LIMIT {
-		if calculate_fibonacci_loop(index) % 2 == 0
-		{
-			sum += calculate_fibonacci_loop(index);
-		}
+    while calculate_fibonacci_loop(index) <= NUMBER_LIMIT {
+        if calculate_fibonacci_loop(index) % 2 == 0
+        {
+            sum += calculate_fibonacci_loop(index);
+        }
 
-		index += 1;
-	}
+        index += 1;
+    }
 
     sum
 }
 
-fn sum_even_valued_fibonacci_terms_recursive() -> i64{
+#[allow(dead_code)]
+fn sum_even_valued_fibonacci_terms_recursive() -> i64 {
     let mut sum = 0;
-	let mut index = 2;
+    let mut index = 2;
 
-	while calculate_fibonacci_recursive(index) <= NUMBER_LIMIT {
-		if calculate_fibonacci_recursive(index) % 2 == 0
-		{
-			sum += calculate_fibonacci_recursive(index);
-		}
+    while calculate_fibonacci_recursive(index) <= NUMBER_LIMIT {
+        if calculate_fibonacci_recursive(index) % 2 == 0
+        {
+            sum += calculate_fibonacci_recursive(index);
+        }
 
-		index += 1;
-	}
+        index += 1;
+    }
 
     sum
 }

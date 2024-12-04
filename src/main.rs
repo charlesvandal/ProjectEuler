@@ -1,19 +1,25 @@
+use crate::state::AppState;
+use crate::tui::App;
+
 mod runner;
 mod solutions;
-mod utilities;
-mod parser;
-mod handler;
+mod tui;
+mod metadata_parser;
+mod state;
 
-use crate::parser::arguments_parser::ArgumentsParser;
-use handler::{arguments_handler::handle_arguments, inputs_handler::handle_inputs};
+fn main() -> std::io::Result<()> {
+    let state = initialize();
+    let app_result = App::new(state).run();
+    dispose();
 
-fn main() {
-    let mut arguments_parser = ArgumentsParser::new();
-    let mut do_exit = false;
+    app_result
+}
 
-    handle_arguments(&mut arguments_parser);
+fn initialize() -> AppState {
+    let problems = metadata_parser::read_problems_from_file("./src/metadata.json").unwrap();
+    AppState::new(problems)
+}
 
-    while !do_exit {
-        do_exit = handle_inputs(&mut arguments_parser);
-    }
+fn dispose() {
+    ratatui::restore()
 }
