@@ -6,8 +6,7 @@ use ratatui::{
     style::{Color, Style, Stylize},
     symbols::border,
     text::Line,
-    widgets::{Block, List, ListItem, Paragraph, StatefulWidget, Widget, Wrap}
-    ,
+    widgets::{Block, List, ListItem, Paragraph, StatefulWidget, Widget, Wrap},
 };
 use std::io;
 
@@ -62,7 +61,8 @@ impl App {
             "<Down>, <s>".blue().bold(),
             " Quit ".into(),
             " <Esc>, <q> ".blue().bold(),
-        ])).centered();
+        ]))
+        .centered();
 
         Block::bordered()
             .title_top(title)
@@ -74,19 +74,19 @@ impl App {
     fn render_result(&self, area: Rect, buf: &mut Buffer) {
         let solution = match self.state.solution_result.as_ref() {
             Some(solution_result) => solution_result.to_string(),
-            None => format!("{}", "Run a solution to see the result")
+            None => format!("{}", "Run a solution to see the result"),
         };
-        let block = Block::bordered()
-            .border_set(border::DOUBLE);
+        let block = Block::bordered().border_set(border::DOUBLE);
 
         Paragraph::new(solution).block(block).render(area, buf);
     }
 
     fn render_problem_list(&mut self, area: Rect, buf: &mut Buffer) {
-        let block = Block::bordered()
-            .border_set(border::THICK);
+        let block = Block::bordered().border_set(border::THICK);
 
-        let items: Vec<ListItem> = self.state.problems
+        let items: Vec<ListItem> = self
+            .state
+            .problems
             .iter()
             .map(|problem| ListItem::new(format!("{:<4}  {}", problem.id, problem.name)))
             .collect();
@@ -95,16 +95,22 @@ impl App {
             List::new(items)
                 .block(block)
                 .highlight_style(Style::default().fg(Color::LightYellow))
-                .highlight_symbol(">> "), area, buf, &mut self.state.list_state);
+                .highlight_symbol(">> "),
+            area,
+            buf,
+            &mut self.state.list_state,
+        );
     }
 
     fn render_description(&mut self, area: Rect, buf: &mut Buffer) {
         let current_index = self.state.list_state.selected().unwrap();
         let description = self.state.problems[current_index].description.clone();
-        let description_block = Block::bordered()
-            .border_set(border::THICK);
+        let description_block = Block::bordered().border_set(border::THICK);
 
-        Paragraph::new(description).wrap(Wrap { trim: true }).block(description_block).render(area, buf);
+        Paragraph::new(description)
+            .wrap(Wrap { trim: true })
+            .block(description_block)
+            .render(area, buf);
     }
 
     fn render(&mut self, area: Rect, buf: &mut Buffer) {
@@ -116,7 +122,11 @@ impl App {
 
         let horizontal_chunks = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(40), Constraint::Min(3), Constraint::Percentage(60)])
+            .constraints([
+                Constraint::Percentage(40),
+                Constraint::Min(3),
+                Constraint::Percentage(60),
+            ])
             .split(vertical_chunks[0]);
 
         self.render_main_window(area, buf);

@@ -20,7 +20,10 @@ pub struct SolutionResult {
 
 impl SolutionResult {
     pub fn new(execution_time: Duration, result: String) -> Self {
-        SolutionResult { execution_time, result }
+        SolutionResult {
+            execution_time,
+            result,
+        }
     }
 }
 

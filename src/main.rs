@@ -1,11 +1,11 @@
 use crate::state::AppState;
 use crate::tui::App;
 
+mod metadata_parser;
 mod runner;
 mod solutions;
-mod tui;
-mod metadata_parser;
 mod state;
+mod tui;
 
 fn main() -> std::io::Result<()> {
     let state = initialize();

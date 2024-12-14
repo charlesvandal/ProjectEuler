@@ -16,8 +16,7 @@ fn get_sum_of_multiples_slow(a: i64, b: i64, upper_bound: i64) -> i64 {
     let mut sum = 0;
 
     for i in 1..upper_bound {
-        if i % a == 0 || i % b == 0
-        {
+        if i % a == 0 || i % b == 0 {
             sum += i;
         }
     }
