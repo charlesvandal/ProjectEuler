@@ -16,8 +16,7 @@ fn sum_even_valued_fibonacci_terms_loop() -> i64 {
     let mut index = 2;
 
     while calculate_fibonacci_loop(index) <= NUMBER_LIMIT {
-        if calculate_fibonacci_loop(index) % 2 == 0
-        {
+        if calculate_fibonacci_loop(index) % 2 == 0 {
             sum += calculate_fibonacci_loop(index);
         }
 
@@ -33,8 +32,7 @@ fn sum_even_valued_fibonacci_terms_recursive() -> i64 {
     let mut index = 2;
 
     while calculate_fibonacci_recursive(index) <= NUMBER_LIMIT {
-        if calculate_fibonacci_recursive(index) % 2 == 0
-        {
+        if calculate_fibonacci_recursive(index) % 2 == 0 {
             sum += calculate_fibonacci_recursive(index);
         }
 

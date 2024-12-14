@@ -20,7 +20,7 @@ fn find_largest_prime_factor(number: i64) -> i64 {
             return *iter;
         }
     }
-    return 0;
+    0
 }
 
 #[cfg(test)]

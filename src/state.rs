@@ -17,7 +17,6 @@ pub struct AppState {
     pub solution_result: Option<SolutionResult>,
 }
 
-
 impl AppState {
     pub fn new(problems: Vec<Problem>) -> Self {
         let mut list_state = ListState::default();
