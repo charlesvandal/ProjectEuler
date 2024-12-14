@@ -25,9 +25,9 @@ impl From<i8> for SolutionsID {
     }
 }
 
-static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, Box<fn() -> SolutionResult>>> =
-    Lazy::new(|| {
-        let mut hash_map = BTreeMap::new();
+type SolutionRunner = Box<fn() -> SolutionResult>;
+static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, SolutionRunner>> = Lazy::new(|| {
+    let mut hash_map = BTreeMap::new();
 
         hash_map.insert(
             SolutionsID::S001,
@@ -55,10 +55,9 @@ static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, Box<fn() -> SolutionRe
 // }
 
 pub fn run_solution(solution_id: &SolutionsID) -> Option<SolutionResult> {
-    match SOLUTIONS_RUN_FUNCTION.get(solution_id) {
-        Some(run_fn) => Some(run_fn()),
-        None => None,
-    }
+    SOLUTIONS_RUN_FUNCTION
+        .get(solution_id)
+        .map(|run_fn| run_fn())
 }
 
 #[cfg(test)]

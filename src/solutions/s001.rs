@@ -33,9 +33,7 @@ fn get_sum_of_multiples_fast(a: i64, b: i64, upper_bound: i64) -> i64 {
     let sum_divisible_by_b = (b * count_divisible_by_b * (count_divisible_by_b + 1)) / 2;
     let sum_divisible_by_ab = (a * b * count_divisible_by_ab * (count_divisible_by_ab + 1)) / 2;
 
-    let sum = sum_divisible_by_a + sum_divisible_by_b - sum_divisible_by_ab;
-
-    sum
+    sum_divisible_by_a + sum_divisible_by_b - sum_divisible_by_ab
 }
 
 fn get_number_divisible_by_n(upper_bound: i64, quotient: i64) -> i64 {

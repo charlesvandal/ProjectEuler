@@ -52,7 +52,7 @@ impl App {
 
     fn render_main_window(&self, area: Rect, buf: &mut Buffer) {
         let title = Line::from(" Project Euler ").blue().bold().centered();
-        let instructions = Line::from(Line::from(vec![
+        let instructions = Line::from(vec![
             " Select ".into(),
             "<Enter>, <e>".blue().bold(),
             " Previous ".into(),
@@ -60,8 +60,8 @@ impl App {
             " Next ".into(),
             "<Down>, <s>".blue().bold(),
             " Quit ".into(),
-            " <Esc>, <q> ".blue().bold(),
-        ]))
+            "<Esc>, <q> ".blue().bold(),
+        ])
         .centered();
 
         Block::bordered()
@@ -74,7 +74,7 @@ impl App {
     fn render_result(&self, area: Rect, buf: &mut Buffer) {
         let solution = match self.state.solution_result.as_ref() {
             Some(solution_result) => solution_result.to_string(),
-            None => format!("{}", "Run a solution to see the result"),
+            None => "Run a solution to see the result".to_string(),
         };
         let block = Block::bordered().border_set(border::DOUBLE);
 
