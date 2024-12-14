@@ -36,6 +36,7 @@ fn find_largest_palindrome_product(input: u32) -> i64 {
     max_palindrome
 }
 
+#[allow(dead_code)]
 fn find_largest_palindrome_product_slow(input: u32) -> i32 {
     let mut max_palindrome = 0;
     let min = 10i32.pow(input - 1);
