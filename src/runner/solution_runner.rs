@@ -9,6 +9,7 @@ pub enum SolutionsID {
     S001,
     S002,
     S003,
+    S004,
     NumberSolutionsId, //Add new IDs before this value
 }
 
@@ -18,19 +19,25 @@ impl From<i8> for SolutionsID {
             0 => SolutionsID::S001,
             1 => SolutionsID::S002,
             2 => SolutionsID::S003,
-            _ => SolutionsID::NumberSolutionsId
+            3 => SolutionsID::S004,
+            _ => SolutionsID::NumberSolutionsId,
         }
     }
 }
 
-static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, Box<fn() -> SolutionResult>>> = Lazy::new(|| {
-    let mut hash_map = BTreeMap::new();
+static SOLUTIONS_RUN_FUNCTION: Lazy<BTreeMap<SolutionsID, Box<fn() -> SolutionResult>>> =
+    Lazy::new(|| {
+        let mut hash_map = BTreeMap::new();
 
-    hash_map.insert(SolutionsID::S001, Box::new(S001::run as fn() -> SolutionResult));
-    hash_map.insert(SolutionsID::S002, Box::new(S002::run));
-    hash_map.insert(SolutionsID::S003, Box::new(S003::run));
-    hash_map
-});
+        hash_map.insert(
+            SolutionsID::S001,
+            Box::new(S001::run as fn() -> SolutionResult),
+        );
+        hash_map.insert(SolutionsID::S002, Box::new(S002::run));
+        hash_map.insert(SolutionsID::S003, Box::new(S003::run));
+        hash_map.insert(SolutionsID::S004, Box::new(S004::run));
+        hash_map
+    });
 
 // TODO This just wont work right now
 // pub fn run_all_solutions() -> i16 {
@@ -53,7 +60,6 @@ pub fn run_solution(solution_id: &SolutionsID) -> Option<SolutionResult> {
         None => None,
     }
 }
-
 
 #[cfg(test)]
 mod test {
